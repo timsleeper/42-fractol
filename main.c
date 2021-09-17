@@ -3,80 +3,60 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ftadeu-d <ftadeu-d@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ftadeu-d <ftadeu-d@student.42sp.org.br>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/07/26 18:22:26 by ftadeu-d          #+#    #+#             */
-/*   Updated: 2021/07/26 20:19:51 by ftadeu-d         ###   ########.fr       */
+/*   Created: 2021/09/12 18:59:57 by ftadeu-d          #+#    #+#             */
+/*   Updated: 2021/09/13 20:37:45 by ftadeu-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "./mlx/mlx.h"
+#include "fractol.h"
 
-#define X_EVENT_KEY_PRESS	2
-#define X_EVENT_KEY_release	3
-#define X_EVENT_KEY_EXIT	17
-
-#define KEY_ESC		53
-# define KEY_Q		12
-# define KEY_W		13
-# define KEY_E		14
-# define KEY_R		15
-# define KEY_A		0
-# define KEY_S		1
-# define KEY_D		2
-
-typedef struct	s_img
+int	ft_isdigit(int c)
 {
-	void	*img;
-	int		*data;
-
-	int		size_l;
-	int		bpp;
-	int		endian;
-}				t_img;
-
-typedef struct	s_param
-{
-	int		x;
-	int		y;
-	char	str[3];
-}				t_param;
-
-void			param_init(t_param *param)
-{
-	param->x = 3;
-	param->y = 4;
-	param->str[0] = 'a';
-	param->str[1] = 'b';
-	param->str[2] = '\0';
+	if (c >= '0' && c <= '9')
+		return (1);
+	else
+		return (0);
 }
 
-int		key_press(int keycode, t_param *param)
+void	errors(void)
 {
-	static int a = 0;
+	printf("error\n");
+	exit(0);
+}
 
-	if (keycode == KEY_W)
-		param->x++;
-	else if (keycode == KEY_S)
-		param->x--;
-	else if (keycode == KEY_ESC)
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	int		i;
+
+	i = 0;
+	while (*(s1 + i) && *(s1 + i) == *(s2 + i))
+		i++;
+	return (*((unsigned char *)s1 + i) - *((unsigned char *)s2 + i));
+}
+
+int	main(int argc, char **argv)
+{
+	t_fractol	*ptr;
+
+	ptr = NULL;
+
+	ptr = (t_fractol *)malloc(sizeof(t_fractol));
+	if (!ptr)
+		errors();
+	ptr->img = (t_img *)malloc(sizeof(t_img));
+	if (!ptr->img)
+		errors();
+	ptr->res_width = 800;
+	ptr->res_height = 600;
+	ptr->shift = 0.1;
+	if (argc < 2 || argc > 4 || init_fract(ptr, argv, argc) != 1)
+	{
+		printf("./fractol mandelbrot\n./fractol julia x.xxx x.xxx\n");
+		printf("./fractol burningship\n");
 		exit(0);
-	printf("x: %d\n", param->x);
+	}
+	fractol(ptr);
 	return (0);
 }
-
-int				main(void)
-{
-	void		*mlx;
-	void		*win;
-	t_param		param;
-
-	param_init(&param);
-	mlx = mlx_init();
-	win = mlx_new_window(mlx, 700, 700, "mlx_project");
-	mlx_hook(win, X_EVENT_KEY_PRESS, 0, &key_press, &param);
-	mlx_loop(mlx);
-}
-
